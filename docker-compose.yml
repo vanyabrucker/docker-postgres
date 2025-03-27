@@ -12,18 +12,15 @@ services:
     restart: always
 
   backup:
-    image: postgres:15.3-alpine
+    build: . # Builds from Dockerfile
     volumes:
-      - ./backup.sh:/backup.sh
-      - ./crontab:/etc/crontabs/root
       - ./backups:/backups
-    entrypoint: /bin/sh -c "
-      apk add --no-cache aws-cli && chmod 0644 /etc/crontabs/root && chmod +x /backup.sh && crond -f -l 8"
+    entrypoint: /bin/sh -c "crond -f -l 8"
     environment:
       POSTGRES_USER: $POSTGRES_USER
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
-      POSTGRES_DB: $POSTGRES_DB 
-      POSTGRES_HOST: db  # Connect to the PostgreSQL container
+      POSTGRES_DB: $POSTGRES_DB
+      POSTGRES_HOST: db
       AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
       AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
       AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION
